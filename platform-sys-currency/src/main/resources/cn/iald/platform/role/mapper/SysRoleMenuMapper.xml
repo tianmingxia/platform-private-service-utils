@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iald.platform.role.mapper.SysRoleMenuMapper">
+
+    <!-- 角色-菜单关联表Map,column是给数据库列起的别名,它对应property类的属性-->
+    <resultMap id="sysRoleMenuMap" type="cn.iald.platform.role.entity.SysRoleMenuEntity">
+        <id column="roleMenuId" property="roleMenuId" />
+        <result column="roleId" property="roleId" />
+        <result column="roleName" property="roleName" />
+        <result column="menuId" property="menuId" />
+        <result column="createTime" property="createTime" />
+    </resultMap>
+
+    <!-- 角色-菜单关联表列 -->
+    <sql id="columnSql">
+        srm.role_menu_id AS roleMenuId,
+        srm.role_id AS roleId,
+        srm.role_name AS roleName,
+        srm.menu_id AS menuId,
+        srm.create_time AS createTime
+    </sql>
+
+    <!-- 新增角色-菜单关联表数据 -->
+    <insert id="save">
+        INSERT INTO sys_role_menu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleMenuId != null">
+                role_menu_id,
+            </if>
+            <if test="roleId != null">
+                role_id,
+            </if>
+            <if test="roleName != null">
+                role_name,
+            </if>
+            <if test="menuId != null">
+                menu_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="roleMenuId != null">
+                #{roleMenuId},
+            </if>
+            <if test="roleId != null">
+                #{roleId},
+            </if>
+            <if test="roleName != null">
+                #{roleName},
+            </if>
+            <if test="menuId != null">
+                #{menuId},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+        </trim>
+    </insert>
+
+    <!--批量新增角色-菜单表数据-->
+    <insert id="batchSave">
+        insert into sys_role_menu(role_menu_id,role_id,role_name,menu_id,create_time) VALUES
+        <foreach collection="sysRoleMenuEntities" item="item" separator=",">
+            (#{item.roleMenuId},#{item.roleId},#{item.roleName},#{item.menuId},#{item.createTime})
+        </foreach>
+    </insert>
+
+    <!-- 修改角色-菜单关联表数据 -->
+    <update id="update">
+        UPDATE sys_role_menu
+        <set>
+            <trim prefix="" suffix="" suffixOverrides=",">
+                 <if test="roleMenuId != null">
+                    role_menu_id = #{roleMenuId},
+                 </if>
+                 <if test="roleId != null">
+                    role_id = #{roleId},
+                 </if>
+                 <if test="roleName != null">
+                    role_name = #{roleName},
+                 </if>
+                 <if test="menuId != null">
+                    menu_id = #{menuId},
+                 </if>
+                 <if test="createTime != null">
+                    create_time = #{createTime}
+                 </if>
+            </trim>
+        </set>
+        WHERE role_menu_id = #{roleMenuId}
+    </update>
+
+    <!-- 更新角色名称 -->
+    <update id="updateRoleName">
+        UPDATE sys_role_menu
+        SET role_name = #{roleName}
+        WHERE role_id = #{roleId}
+    </update>
+
+    <!-- 根据菜单id删除角色对应的菜单-->
+    <delete id="delByMenuId">
+        DELETE FROM sys_role_menu
+        WHERE menu_id IN
+        <trim prefix=" ( " suffix=" ) " suffixOverrides=",">
+            <foreach collection="menuIdList" item="item" index="index" separator=",">
+                #{item}
+            </foreach>
+        </trim>
+    </delete>
+
+    <!-- 根据角色id删除角色对应的菜单授权 -->
+    <delete id="delByRoleId">
+        DELETE FROM sys_role_menu
+        WHERE role_id = #{roleId}
+    </delete>
+
+    <!-- 角色-菜单关联表查询条件 -->
+    <sql id="whereSql">
+        <if test="roleMenuId != null">
+            AND srm.role_menu_id = #{roleMenuId}
+        </if>
+        <if test="roleId != null">
+            AND srm.role_id = #{roleId}
+        </if>
+        <if test="roleName != null and roleName != ''">
+            AND srm.role_name = #{roleName}
+        </if>
+        <if test="menuId != null">
+            AND srm.menu_id = #{menuId}
+        </if>
+        <if test="createTime != null">
+            AND srm.create_time = #{createTime}
+        </if>
+           AND 1 = 1
+    </sql>
+
+    <!-- 根据查询条件查询角色-菜单关联表满足条件的List -->
+    <select id="listForParam" resultMap="sysRoleMenuMap">
+        SELECT
+            <include refid="columnSql"/>
+        FROM sys_role_menu AS srm
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="whereSql"/>
+        </trim>
+        ORDER BY srm.role_menu_id
+    </select>
+
+    <!-- 根据查询条件查询角色-菜单关联表满足条件的Vo列表 -->
+    <select id="listVoForParam" resultType="cn.iald.platform.role.vo.SysRoleMenuVo">
+        SELECT
+            distinct
+            smi.menu_id AS menuId,
+            smi.menu_code AS menuCode,
+            smi.menu_name AS menuName,
+            smi.menu_type AS menuType,
+            smi.parent_id AS parentId,
+            smi.menu_ico AS menuIco,
+            smi.status AS status,
+            srm.role_id AS roleId,
+            srm.role_name AS roleName,
+            (CASE srm.role_id IS NULL WHEN TRUE THEN 0 ELSE 1 END) AS checked
+        FROM
+            sys_menu_info AS smi LEFT JOIN sys_role_menu AS srm
+        ON(smi.menu_id = srm.menu_id AND srm.role_id = #{roleId})
+        WHERE  smi.status = 1
+          AND smi.del_flag = 1
+        ORDER By smi.sort_no,smi.menu_id
+    </select>
+
+    <!-- 查询指定ID的角色-菜单关联表数据 -->
+    <select id="getObjectById" resultMap="sysRoleMenuMap">
+        SELECT
+            <include refid="columnSql"/>
+        FROM sys_role_menu AS srm
+        WHERE srm.role_menu_id = #{roleMenuId}
+    </select>
+
+    <!-- 获取菜单对应的角色名称 -->
+    <select id="findRoleNameByMenuId" resultType="java.lang.String">
+        SELECT
+            distinct
+            srm.role_name AS roleName
+        FROM
+            sys_role_menu AS srm
+        WHERE srm.menu_id = #{menuId}
+    </select>
+
+    <!--菜单是否在角色中使用 -->
+    <select id="findRoleMenuCnt" resultType="java.lang.Long">
+        SELECT
+            COUNT(1)
+        FROM
+            sys_role_menu AS srm
+        WHERE srm.menu_id = #{menuId}
+    </select>
+
+	<!-- 获取指定角色系统下的菜单信息-->
+	<select id="findRoleMenuCode" resultType="cn.iald.platform.login.vo.LoginRoleMenuVo">
+        SELECT
+            distinct
+            smi.menu_code AS menuCode,
+            smi.menu_id AS menuId,
+            smi.menu_type AS menuType,
+            smi.parent_id AS parentId
+        FROM sys_menu_info AS smi
+        LEFT JOIN sys_role_menu AS srm ON ( smi.menu_id = srm.menu_id )
+        WHERE
+            smi.status = 1
+        AND smi.del_flag = 1
+        AND srm.role_id IN
+        <trim prefix=" ( " suffix=" ) " suffixOverrides=",">
+            <foreach collection="roleIdList" item="item" index="index" separator=",">
+                #{item}
+            </foreach>
+        </trim>
+        ORDER BY smi.sort_no,smi.menu_id
+    </select>
+</mapper>

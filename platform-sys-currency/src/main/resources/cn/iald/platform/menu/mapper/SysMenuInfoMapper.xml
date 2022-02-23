@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iald.platform.menu.mapper.SysMenuInfoMapper">
+    <!-- 添加缓存-->
+    <cache eviction="LRU" type="cn.iald.platform.common.mybatis.MybatisRedisCache"/>
+
+    <!-- 菜单信息表Map,column是给数据库列起的别名,它对应property类的属性-->
+    <resultMap id="sysMenuInfoMap" type="cn.iald.platform.menu.entity.SysMenuInfoEntity">
+        <id column="menuId" property="menuId" />
+        <result column="menuCode" property="menuCode" />
+        <result column="menuName" property="menuName" />
+        <result column="menuUrl" property="menuUrl" />
+        <result column="menuUrlEx" property="menuUrlEx" />
+        <result column="menuType" property="menuType" />
+        <result column="parentId" property="parentId" />
+        <result column="sortNo" property="sortNo" />
+        <result column="menuIco" property="menuIco" />
+        <result column="status" property="status" />
+        <result column="delFlag" property="delFlag" />
+        <result column="createBy" property="createBy" />
+        <result column="createTime" property="createTime" />
+        <result column="updateBy" property="updateBy" />
+        <result column="updateTime" property="updateTime" />
+        <result column="subFlag" property="subFlag" />
+        <result column="platformId" property="platformId" />
+        <result column="systemId" property="systemId" />
+    </resultMap>
+
+    <!-- 菜单信息表列 -->
+    <sql id="columnSql">
+        (CASE (SELECT COUNT(1) FROM sys_menu_info AS t WHERE t.parent_id = smi.menu_id AND t.status IN (1,-1)) >0
+            WHEN TRUE THEN 1 ELSE 0	END) AS subFlag,
+        smi.menu_id AS menuId,
+        smi.menu_code AS menuCode,
+        smi.menu_name AS menuName,
+        smi.menu_url AS menuUrl,
+        smi.menu_url_ex AS menuUrlEx,
+        smi.menu_type AS menuType,
+        smi.parent_id AS parentId,
+        smi.sort_no AS sortNo,
+        smi.menu_ico AS menuIco,
+        smi.status AS status,
+        smi.del_flag AS delFlag,
+        smi.create_by AS createBy,
+        smi.create_time AS createTime,
+        smi.update_by AS updateBy,
+        smi.platform_id AS platformId,
+        smi.system_id AS systemId,
+        smi.update_time AS updateTime
+    </sql>
+
+    <!-- 新增菜单信息表数据 -->
+    <insert id="save">
+        INSERT INTO sys_menu_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="menuId != null">
+                menu_id,
+            </if>
+            <if test="menuCode != null">
+                menu_code,
+            </if>
+            <if test="menuName != null">
+                menu_name,
+            </if>
+            <if test="menuUrl != null">
+                menu_url,
+            </if>
+            <if test="menuUrlEx != null">
+                menu_url_ex,
+            </if>
+            <if test="menuType != null">
+                menu_type,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="sortNo != null">
+                sort_no,
+            </if>
+            <if test="menuIco != null">
+                menu_ico,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="delFlag != null">
+                del_flag,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="platformId != null">
+                platform_id,
+            </if>
+            <if test="systemId != null">
+                system_id,
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="menuId != null">
+                #{menuId},
+            </if>
+            <if test="menuCode != null">
+                #{menuCode},
+            </if>
+            <if test="menuName != null">
+                #{menuName},
+            </if>
+            <if test="menuUrl != null">
+                #{menuUrl},
+            </if>
+            <if test="menuUrlEx != null">
+                #{menuUrlEx},
+            </if>
+            <if test="menuType != null">
+                #{menuType},
+            </if>
+            <if test="parentId != null">
+                #{parentId},
+            </if>
+            <if test="sortNo != null">
+                #{sortNo},
+            </if>
+            <if test="menuIco != null">
+                #{menuIco},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="delFlag != null">
+                #{delFlag},
+            </if>
+            <if test="createBy != null">
+                #{createBy},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+            <if test="platformId != null">
+                #{platformId},
+            </if>
+            <if test="systemId != null">
+                #{systemId},
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 修改菜单信息表数据 -->
+    <update id="update">
+        UPDATE sys_menu_info
+        <set>
+            <trim prefix="" suffix="" suffixOverrides=",">
+                <if test="menuId != null">
+                    menu_id = #{menuId},
+                </if>
+                <if test="menuCode != null">
+                    menu_code = #{menuCode},
+                </if>
+                <if test="menuName != null">
+                    menu_name = #{menuName},
+                </if>
+                <if test="menuUrl != null">
+                    menu_url = #{menuUrl},
+                </if>
+                <if test="menuUrlEx != null">
+                    menu_url_ex = #{menuUrlEx},
+                </if>
+                <if test="menuType != null">
+                    menu_type = #{menuType},
+                </if>
+                <if test="parentId != null">
+                    parent_id = #{parentId},
+                </if>
+                <if test="sortNo != null">
+                    sort_no = #{sortNo},
+                </if>
+                <if test="menuIco != null">
+                    menu_ico = #{menuIco},
+                </if>
+                <if test="status != null">
+                    status = #{status},
+                </if>
+                <if test="delFlag != null">
+                    del_flag = #{delFlag},
+                </if>
+                <if test="platformId != null">
+                    platform_id = #{platformId},
+                </if>
+                <if test="systemId != null">
+                    system_id = #{systemId},
+                </if>
+                <if test="createBy != null">
+                    create_by = #{createBy},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime},
+                </if>
+                <if test="updateBy != null">
+                    update_by = #{updateBy},
+                </if>
+                <if test="updateTime != null">
+                    update_time = #{updateTime}
+                </if>
+            </trim>
+        </set>
+        WHERE menu_id = #{menuId}
+    </update>
+
+    <!-- 菜单信息表查询条件 -->
+    <sql id="whereSql">
+        <if test="menuId != null">
+            AND smi.menu_id = #{menuId}
+        </if>
+        <if test="menuCode != null and menuCode != ''">
+            AND smi.menu_code = #{menuCode}
+        </if>
+        <if test="menuName != null and menuName != ''">
+            AND smi.menu_name = #{menuName}
+        </if>
+        <if test="menuUrl != null and menuUrl != ''">
+            AND smi.menu_url = #{menuUrl}
+        </if>
+        <if test="menuUrlEx != null and menuUrlEx != ''">
+            AND smi.menu_url_ex = #{menuUrlEx}
+        </if>
+        <if test="menuType != null">
+            AND smi.menu_type = #{menuType}
+        </if>
+        <if test="parentId != null">
+            AND smi.parent_id = #{parentId}
+        </if>
+        <if test="sortNo != null">
+            AND smi.sort_no = #{sortNo}
+        </if>
+        <if test="menuIco != null and menuIco != ''">
+            AND smi.menu_ico = #{menuIco}
+        </if>
+        <if test="status != null">
+            AND smi.status = #{status}
+        </if>
+        <if test="delFlag != null">
+            AND smi.del_flag = #{delFlag}
+        </if>
+        <if test="createBy != null">
+            AND smi.create_by = #{createBy}
+        </if>
+        <if test="createTime != null">
+            AND smi.create_time = #{createTime}
+        </if>
+        <if test="updateBy != null">
+            AND smi.update_by = #{updateBy}
+        </if>
+        <if test="updateTime != null">
+            AND smi.update_time = #{updateTime}
+        </if>
+        <if test="platformId != null">
+            AND smi.platform_id = #{platformId}
+        </if>
+        <if test="systemId != null">
+            AND smi.system_id = #{systemId}
+        </if>
+        AND smi.del_flag = 1
+    </sql>
+
+    <!-- 根据查询条件查询菜单信息表满足条件的List -->
+    <select id="listForParam" resultMap="sysMenuInfoMap">
+        SELECT
+        <include refid="columnSql"/>
+        FROM sys_menu_info AS smi
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="whereSql"/>
+        </trim>
+        ORDER BY smi.sort_no,smi.menu_id
+    </select>
+
+    <!-- 根据查询条件查询菜单信息表满足条件的Vo列表 -->
+    <select id="listVoForParam" resultType="cn.iald.platform.menu.vo.SysMenuInfoVo">
+        SELECT
+        <include refid="columnSql"/>
+        FROM sys_menu_info AS smi
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="whereSql"/>
+        </trim>
+        ORDER BY smi.sort_no,smi.menu_id
+    </select>
+
+    <!-- 查询指定ID的菜单信息表数据 -->
+    <select id="getObjectById" resultMap="sysMenuInfoMap">
+        SELECT
+        <include refid="columnSql"/>
+        FROM sys_menu_info AS smi
+        WHERE smi.menu_id = #{menuId}
+    </select>
+
+    <!-- 根据查询条件查询菜单表满足条件的Cnt -->
+    <select id="listCnt" resultType="java.lang.Long" useCache="false">
+        SELECT
+        COUNT(1)
+        FROM sys_menu_info AS smi
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="menuId != null">
+                AND smi.menu_id <![CDATA[ <> ]]> #{menuId}
+            </if>
+            <if test="menuCode != null and menuCode != ''">
+                AND smi.menu_code = #{menuCode}
+            </if>
+            <if test="systemId != null">
+                AND smi.system_id = #{systemId}
+            </if>
+            AND smi.del_flag = 1
+        </trim>
+    </select>
+</mapper>
